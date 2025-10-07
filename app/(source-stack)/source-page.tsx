@@ -16,7 +16,7 @@ export default function SourcePage() {
 
       
       <Link href="/(tabs)/target-nested-stack/target-page" style={{color: '#0000EE', textDecorationLine: 'underline'}}>Go to Target Page - without withAnchor</Link>
-      <Link href="/(tabs)/target-nested-stack/target-page" style={{color: '#0000EE', textDecorationLine: 'underline'}}>Go to Target Page - with withAnchor</Link>
+      <Link href="/(tabs)/target-nested-stack/target-page" style={{color: '#0000EE', textDecorationLine: 'underline'}} withAnchor>Go to Target Page - with withAnchor</Link>
     </View>
   );
 }
