@@ -1,50 +1,44 @@
-# Welcome to your Expo app 👋
+# With Anchor Bug
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is a minimal reproducible example for an expo router bug in v6
 
-## Get started
+withAnchor is not respected when navigating to a nested stack.
 
-1. Install dependencies
+This is because the `initial` property is only set on the root node of the dispatched react navigation event (not the leaf node)
 
-   ```bash
-   npm install
-   ```
+This can be fixed by setting the property in nested navigation params
 
-2. Start the app
+For example:
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+/expo-router@6.0.9/build/global-state/routing.js
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+```
+    if (withAnchor !== undefined) {
+        if (rootPayload.params.initial) {
+            if (process.env.NODE_ENV !== 'production') {
+                console.warn(`The parameter 'initial' is a reserved parameter name in React Navigation`);
+            }
+        }
+        /*
+         * The logic for initial can seen backwards depending on your perspective
+         *   True: The initialRouteName is not loaded. The incoming screen is the initial screen (default)
+         *   False: The initialRouteName is loaded. THe incoming screen is placed after the initialRouteName
+         *
+         * withAnchor flips the perspective.
+         *   True: You want the initialRouteName to load.
+         *   False: You do not want the initialRouteName to load.
+         */
 
-## Learn more
+        rootPayload.params.initial = !withAnchor;
+        let currentPayload = rootPayload;
+        while (currentPayload.params) {
+            currentPayload.params.initial = !withAnchor;
+            currentPayload = currentPayload.params;
+            }
+        }
 
-To learn more about developing your project with Expo, look at the following resources:
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+We have patched this locally
