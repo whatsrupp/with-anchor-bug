@@ -8,6 +8,11 @@ This is because the `initial` property is only set on the root node of the dispa
 
 This can be fixed by setting the property in nested navigation params
 
+Reproducing:
+
+- go to the source stack page
+- then navigate to the target page in a nested parallel stack
+
 For example:
 
 ```
